@@ -22,8 +22,11 @@ namespace WFPackCredsManager
             foreach (var url in spClient.ActionsPackSites.Keys)
             {
                 var info = spClient.ActionsPackSites[url];
-                Console.WriteLine($"Site {url} uses {info?.DefaultLogin ?? "empty"} account");
+                var uri = new Uri(url);
+
+                Console.WriteLine($"Site {uri.PathAndQuery} uses {info?.DefaultLogin ?? "empty"} account");
             }
+
 
             if (opt.Force)
             {

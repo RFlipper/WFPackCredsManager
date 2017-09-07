@@ -76,21 +76,32 @@ namespace WFPackCredsManager
                 web.Update();
                 _context.ExecuteQuery();
 
-                Console.WriteLine($"Site {web.Url} workflow actions pack credentials were updated");
+                var uri = new Uri(web.Url);
+
+                Console.WriteLine($"Site {uri.PathAndQuery} workflow actions pack credentials were updated");
             }
         }
 
         private WFPackSettings GetWFPackSettings(Web web)
         {
-            if (!web.AllProperties.FieldValues.ContainsKey(_wfProperty))
+            try
             {
-                return null;
+                if (!web.AllProperties.FieldValues.ContainsKey(_wfProperty))
+                {
+                    return null;
+                }
+
+                var property = web.AllProperties[_wfProperty] as string;
+                var settings = JsonConvert.DeserializeObject<WFPackSettings>(property);
+
+                return settings;
             }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine("Cannot get settings from {0} {1} {2}", web.Url, ex, ex.StackTrace);
 
-            var property = web.AllProperties[_wfProperty] as string;
-            var settings = JsonConvert.DeserializeObject<WFPackSettings>(property);
-
-            return settings;
+                throw;
+            }
         }
     }
 }
